@@ -685,6 +685,7 @@ async function confirmAction(){
   confirmBtn.disabled = true;
 
   try{
+    let resultEntry;
     await runTransaction(db, async (tx) => {
       const snap = await tx.get(claimsRef);
       const data = snap.exists() ? snap.data() : {};
@@ -700,8 +701,10 @@ async function confirmAction(){
         c.count = Math.max(0, c.count - 1);
         if(c.count <= 0){
           delete data[itemId];
+          resultEntry = null;
         } else {
           data[itemId] = c;
+          resultEntry = c;
         }
       } else {
         if(!unlimited && c.count >= item.qty){
@@ -711,15 +714,27 @@ async function confirmAction(){
         c.claimers = c.claimers || [];
         c.claimers.push(MY_ID);
         data[itemId] = c;
+        resultEntry = c;
       }
       tx.set(claimsRef, data);
     });
+
+    // Atualiza a tela na hora, sem esperar o retorno do listener em tempo real
+    const prevClaims = claims;
+    const nextClaims = { ...claims };
+    if(resultEntry){
+      nextClaims[itemId] = resultEntry;
+    } else {
+      delete nextClaims[itemId];
+    }
+    claims = nextClaims;
+    patchChangedItems(prevClaims, nextClaims);
+    updateStats();
 
     closeModal();
     showToast(mode === 'undo'
       ? 'Pronto, o item foi liberado novamente.'
       : 'Item escolhido. Obrigada por fazer parte disso!');
-    // a lista atualiza sozinha via onSnapshot
   }catch(e){
     closeModal();
     if(e.message === 'full'){
