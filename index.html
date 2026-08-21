@@ -163,6 +163,10 @@
     position:absolute; left:0; top:0; bottom:0; background:var(--ink);
     width:0%; transition:width 0.6s ease;
   }
+  .color-note{
+    text-align:center; font-size:12.5px; color:var(--ink-faint);
+    max-width:420px; margin:18px auto 0; line-height:1.6;
+  }
 
   /* ---------- GIFT LIST ---------- */
   .list-section{ padding:28px 0 100px; }
@@ -377,6 +381,8 @@
       <span class="num" id="stat-total">0</span>
       <span>presentes j&aacute; garantidos</span>
     </div>
+
+    <p class="color-note">Se puder, prefira tons neutros e claros &mdash; branco, bege e cinza &mdash; para os itens com varia&ccedil;&atilde;o de cor.</p>
   </div>
 
   <section class="list-section">
@@ -435,6 +441,7 @@ let openCategories = new Set([0]);
 let pendingItemId = null;
 let pendingMode = 'claim';
 let firstLoad = true;
+let categoriesMounted = false;
 
 function esc(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -442,6 +449,36 @@ function esc(s){
 
 function getClaim(id){
   return claims[id] || { count:0, claimers:[] };
+}
+
+function patchChangedItems(prevClaims, nextClaims){
+  const changedIds = new Set();
+  const allIds = new Set([...Object.keys(prevClaims || {}), ...Object.keys(nextClaims || {})]);
+  allIds.forEach(id => {
+    const before = JSON.stringify((prevClaims || {})[id] || null);
+    const after = JSON.stringify((nextClaims || {})[id] || null);
+    if(before !== after) changedIds.add(id);
+  });
+  if(!changedIds.size) return;
+
+  const touchedCatEls = new Set();
+  changedIds.forEach(id => {
+    const item = findItem(id);
+    if(!item) return;
+    const oldRow = document.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+    if(oldRow){
+      const newRow = renderItem(item);
+      oldRow.replaceWith(newRow);
+      const catEl = newRow.closest('.category');
+      if(catEl) touchedCatEls.add(catEl);
+    }
+  });
+  touchedCatEls.forEach(catEl => {
+    if(catEl.classList.contains('open')){
+      const body = catEl.querySelector('.cat-body');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  });
 }
 
 function renderCategories(){
@@ -719,8 +756,15 @@ function hideLoading(){
 }
 
 onSnapshot(claimsRef, (snap) => {
-  claims = snap.exists() ? snap.data() : {};
-  renderCategories();
+  const nextClaims = snap.exists() ? snap.data() : {};
+  if(!categoriesMounted){
+    categoriesMounted = true;
+    claims = nextClaims;
+    renderCategories();
+  } else {
+    patchChangedItems(claims, nextClaims);
+    claims = nextClaims;
+  }
   updateStats();
   if(firstLoad){
     firstLoad = false;
@@ -729,6 +773,7 @@ onSnapshot(claimsRef, (snap) => {
 }, (err) => {
   if(firstLoad){
     firstLoad = false;
+    categoriesMounted = true;
     renderCategories();
     updateStats();
     hideLoading();
