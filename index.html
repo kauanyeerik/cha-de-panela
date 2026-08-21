@@ -762,8 +762,9 @@ onSnapshot(claimsRef, (snap) => {
     claims = nextClaims;
     renderCategories();
   } else {
-    patchChangedItems(claims, nextClaims);
+    const prevClaims = claims;
     claims = nextClaims;
+    patchChangedItems(prevClaims, nextClaims);
   }
   updateStats();
   if(firstLoad){
