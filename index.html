@@ -105,6 +105,17 @@
     font-size:15.5px;
     line-height:1.65;
   }
+  .countdown{
+    display:inline-flex; align-items:baseline; gap:8px;
+    margin:0 0 30px; padding:10px 22px;
+    border:1px solid var(--line-strong); border-radius:999px;
+  }
+  .countdown .countdown-num{
+    font-family:'Montserrat', sans-serif; font-weight:700; font-size:18px;
+  }
+  .countdown .countdown-label{
+    font-size:12px; letter-spacing:0.04em; color:var(--ink-soft);
+  }
   .hero .cta{
     display:inline-flex; align-items:center; gap:10px;
     background:var(--ink); color:var(--bg);
@@ -166,6 +177,20 @@
   .color-note{
     text-align:center; font-size:12.5px; color:var(--ink-faint);
     max-width:420px; margin:18px auto 0; line-height:1.6;
+  }
+  .color-swatches{
+    display:flex; justify-content:center; flex-wrap:wrap;
+    gap:18px; margin:14px auto 0; max-width:420px;
+  }
+  .swatch-item{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .swatch{
+    width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line-strong); display:block;
+  }
+  .swatch-item span.swatch-label{
+    font-size:11px; color:var(--ink-faint); letter-spacing:0.01em;
   }
 
   /* ---------- GIFT LIST ---------- */
@@ -351,6 +376,7 @@
       <img class="hero-illustration" src="cha-de-panela-hero.svg" alt="Ilustração de chá de panela">
       <h1 class="sr-only">Chá de panela &mdash; Kauany &amp; Erik</h1>
       <p class="lede">Preparamos uma listinha com tudo que vai ajudar a dar vida &agrave; nossa casa nova. Escolha um item e ele j&aacute; fica reservado para voc&ecirc;, evitando presentes repetidos. A lista &eacute; s&oacute; um guia, ent&atilde;o fique &agrave; vontade para escolher algo especial que n&atilde;o esteja por aqui, se preferir.</p>
+      <div class="countdown" id="countdown"></div>
       <button class="cta" id="scroll-cta">
         Ver lista de presentes
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
@@ -382,7 +408,13 @@
       <span>presentes j&aacute; garantidos</span>
     </div>
 
-    <p class="color-note">Se puder, prefira tons neutros e claros &mdash; branco, bege e cinza &mdash; para os itens com varia&ccedil;&atilde;o de cor.</p>
+    <p class="color-note">Se puder, prefira tons neutros e claros para os itens com varia&ccedil;&atilde;o de cor.</p>
+    <div class="color-swatches">
+      <div class="swatch-item"><span class="swatch" style="background:#E9DFC9;"></span><span class="swatch-label">Bege</span></div>
+      <div class="swatch-item"><span class="swatch" style="background:#C6C6C3;"></span><span class="swatch-label">Cinza</span></div>
+      <div class="swatch-item"><span class="swatch" style="background:#FFFFFF;"></span><span class="swatch-label">Branco</span></div>
+      <div class="swatch-item"><span class="swatch" style="background:#F3CFCC;"></span><span class="swatch-label">Rosinha claro</span></div>
+    </div>
   </div>
 
   <section class="list-section">
@@ -424,7 +456,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const claimsRef = doc(db, 'cha-de-panela', 'claims');
 
-const GIFT_DATA = [{"name": "Cozinha", "items": [{"id": "cozinha--frigideira", "name": "Frigideira", "qty": 1}, {"id": "cozinha--forminha-de-gelo", "name": "Forminha de gelo", "qty": 2}, {"id": "cozinha--pegador-de-gelo", "name": "Pegador de gelo", "qty": 1}, {"id": "cozinha--leiteira", "name": "Leiteira", "qty": 1}, {"id": "cozinha--forma-de-bolo", "name": "Forma de bolo", "qty": 2}, {"id": "cozinha--forma-retangular", "name": "Forma retangular", "qty": 2}, {"id": "cozinha--forma-redonda", "name": "Forma redonda", "qty": 2}, {"id": "cozinha--assadeira-grande", "name": "Assadeira grande", "qty": 2}, {"id": "cozinha--refratario-de-vidro-pequeno", "name": "Refratário de vidro pequeno", "qty": 1}, {"id": "cozinha--refratario-de-vidro-medio", "name": "Refratário de vidro médio", "qty": 1}, {"id": "cozinha--refratario-de-vidro-grande", "name": "Refratário de vidro grande", "qty": 1}, {"id": "cozinha--tabua-de-corte", "name": "Tábua de corte", "qty": 1}, {"id": "cozinha--escorredor-de-macarrao", "name": "Escorredor de macarrão", "qty": 1}, {"id": "cozinha--peneira", "name": "Peneira", "qty": 1}, {"id": "cozinha--ralador", "name": "Ralador", "qty": 1}, {"id": "cozinha--espremedor-de-alho", "name": "Espremedor de alho", "qty": 1}, {"id": "cozinha--abridor-de-latas", "name": "Abridor de latas", "qty": 1}, {"id": "cozinha--descascador-de-legumes", "name": "Descascador de legumes", "qty": 1}, {"id": "cozinha--cortador-de-pizza", "name": "Cortador de pizza", "qty": 1}, {"id": "cozinha--fouet", "name": "Fouet", "qty": 1}, {"id": "cozinha--pegador-de-massa", "name": "Pegador de massa", "qty": 2}, {"id": "cozinha--espatula-de-silicone", "name": "Espátula de silicone", "qty": 1}, {"id": "cozinha--colher-de-silicone", "name": "Colher de silicone", "qty": 1}, {"id": "cozinha--concha-grande", "name": "Concha grande", "qty": 1}, {"id": "cozinha--concha-pequena", "name": "Concha pequena", "qty": 1}, {"id": "cozinha--escumadeira", "name": "Escumadeira", "qty": 1}, {"id": "cozinha--colher-de-pau", "name": "Colher de pau", "qty": null}, {"id": "cozinha--copo-medidor", "name": "Copo medidor", "qty": 1}, {"id": "cozinha--colheres-medidoras", "name": "Colheres medidoras", "qty": 1}, {"id": "cozinha--colher-grande-de-servir", "name": "Colher grande de servir", "qty": 2}, {"id": "cozinha--faca-grande", "name": "Faca grande", "qty": 2}, {"id": "cozinha--garrafa-termica", "name": "Garrafa térmica", "qty": 1}, {"id": "cozinha--chaleira-eletrica", "name": "Chaleira elétrica", "qty": 1}, {"id": "cozinha--sanduicheira", "name": "Sanduicheira", "qty": 1}]}, {"name": "Louça e mesa", "items": [{"id": "louca-e-mesa--prato-de-sobremesa", "name": "Prato de sobremesa", "qty": 2}, {"id": "louca-e-mesa--pratos-rasos-fundos", "name": "Pratos rasos/fundos", "qty": 1}, {"id": "louca-e-mesa--copos", "name": "Copos", "qty": 2}, {"id": "louca-e-mesa--canecas", "name": "Canecas", "qty": null}, {"id": "louca-e-mesa--xicaras-de-cafe", "name": "Xícaras de café", "qty": 1}, {"id": "louca-e-mesa--jogo-de-talheres", "name": "Jogo de talheres", "qty": 1}, {"id": "louca-e-mesa--jarra-de-vidro", "name": "Jarra de vidro", "qty": 1}, {"id": "louca-e-mesa--acucareiro", "name": "Açucareiro", "qty": 1}, {"id": "louca-e-mesa--mantegueira", "name": "Mantegueira", "qty": 1}, {"id": "louca-e-mesa--saleiro", "name": "Saleiro", "qty": 1}, {"id": "louca-e-mesa--porta-guardanapos", "name": "Porta-guardanapos", "qty": 1}, {"id": "louca-e-mesa--descanso-de-panela", "name": "Descanso de panela", "qty": 2}, {"id": "louca-e-mesa--jogo-americano", "name": "Jogo americano", "qty": 1}]}, {"name": "Potes e organização", "items": [{"id": "potes-e-organizacao--porta-ovos", "name": "Porta ovos", "qty": 1}, {"id": "potes-e-organizacao--porta-talheres-para-gaveta", "name": "Porta talheres para gaveta", "qty": 1}, {"id": "potes-e-organizacao--porta-temperos", "name": "Porta temperos", "qty": 1}, {"id": "potes-e-organizacao--potes-hermeticos-para-mantimentos", "name": "Potes herméticos para mantimentos", "qty": 1}, {"id": "potes-e-organizacao--potes-de-vidro-para-geladeira", "name": "Potes de vidro para geladeira", "qty": null}, {"id": "potes-e-organizacao--porta-cha", "name": "Porta chá", "qty": 1}, {"id": "potes-e-organizacao--pote-para-arroz", "name": "Pote para arroz", "qty": 1}, {"id": "potes-e-organizacao--bowls-tigelas", "name": "Bowls/tigelas", "qty": null}, {"id": "potes-e-organizacao--potes-hermeticos-de-acrilico", "name": "Potes herméticos de acrílico", "qty": null}, {"id": "potes-e-organizacao--potes-hermeticos-de-vidro", "name": "Potes herméticos de vidro", "qty": null}, {"id": "potes-e-organizacao--porta-pao", "name": "Porta pão", "qty": 1}]}, {"name": "Limpeza", "items": [{"id": "limpeza--escorredor-de-louca", "name": "Escorredor de louça", "qty": 1}, {"id": "limpeza--lixeira-pequena-para-pia", "name": "Lixeira pequena para pia", "qty": 1}, {"id": "limpeza--porta-detergente-esponja", "name": "Porta detergente/esponja", "qty": 1}, {"id": "limpeza--panos-de-prato", "name": "Panos de prato", "qty": null}, {"id": "limpeza--panos-multiuso", "name": "Panos multiuso", "qty": null}, {"id": "limpeza--luvas-de-cozinha", "name": "Luvas de cozinha", "qty": 1}, {"id": "limpeza--rodo-de-pia", "name": "Rodo de pia", "qty": 1}, {"id": "limpeza--panos-microfibra", "name": "Panos microfibra", "qty": null}]}, {"name": "Banheiro", "items": [{"id": "banheiro--toalhas-de-rosto", "name": "Toalhas de rosto", "qty": null}, {"id": "banheiro--tapete-de-banheiro", "name": "Tapete de banheiro", "qty": 1}, {"id": "banheiro--porta-sabonete-liquido", "name": "Porta sabonete líquido", "qty": 1}, {"id": "banheiro--saboneteira", "name": "Saboneteira", "qty": 1}, {"id": "banheiro--porta-escovas-de-dente-com-tampa", "name": "Porta escovas de dente com tampa", "qty": 1}, {"id": "banheiro--lixeira-de-banheiro", "name": "Lixeira de banheiro", "qty": 1}, {"id": "banheiro--escova-sanitaria", "name": "Escova sanitária", "qty": 1}, {"id": "banheiro--porta-papel-higienico", "name": "Porta papel higiênico", "qty": 1}, {"id": "banheiro--cesto-de-roupa-suja", "name": "Cesto de roupa suja", "qty": 1}]}, {"name": "Quarto", "items": [{"id": "quarto--cabides", "name": "Cabides", "qty": null}, {"id": "quarto--fronhas-avulsas", "name": "Fronhas avulsas", "qty": null}, {"id": "quarto--colmeias-organizadores-de-gaveta", "name": "Colmeias/organizadores de gaveta", "qty": null}]}, {"name": "Lavanderia e limpeza da casa", "items": [{"id": "lavanderia-e-limpeza-da-casa--pregadores", "name": "Pregadores", "qty": null}, {"id": "lavanderia-e-limpeza-da-casa--baldes", "name": "Baldes", "qty": null}, {"id": "lavanderia-e-limpeza-da-casa--rodo", "name": "Rodo", "qty": 1}, {"id": "lavanderia-e-limpeza-da-casa--vassoura", "name": "Vassoura", "qty": 2}, {"id": "lavanderia-e-limpeza-da-casa--pa-de-lixo", "name": "Pá de lixo", "qty": 1}, {"id": "lavanderia-e-limpeza-da-casa--espanador", "name": "Espanador", "qty": 1}]}];
+const GIFT_DATA = [{"name": "Cozinha", "items": [{"id": "cozinha--frigideira", "name": "Frigideira", "qty": 1}, {"id": "cozinha--forminha-de-gelo", "name": "Forminha de gelo", "qty": 2}, {"id": "cozinha--pegador-de-gelo", "name": "Pegador de gelo", "qty": 1}, {"id": "cozinha--leiteira", "name": "Leiteira", "qty": 1}, {"id": "cozinha--forma-de-bolo", "name": "Forma de bolo", "qty": 2}, {"id": "cozinha--forma-retangular", "name": "Forma retangular", "qty": 2}, {"id": "cozinha--forma-redonda", "name": "Forma redonda", "qty": 2}, {"id": "cozinha--assadeira-grande", "name": "Assadeira grande", "qty": 2}, {"id": "cozinha--refratario-de-vidro-pequeno", "name": "Refratário de vidro pequeno", "qty": 1}, {"id": "cozinha--refratario-de-vidro-medio", "name": "Refratário de vidro médio", "qty": 1}, {"id": "cozinha--refratario-de-vidro-grande", "name": "Refratário de vidro grande", "qty": 1}, {"id": "cozinha--tabua-de-corte", "name": "Tábua de corte", "qty": 1}, {"id": "cozinha--peneira", "name": "Peneira", "qty": 1}, {"id": "cozinha--ralador", "name": "Ralador", "qty": 1}, {"id": "cozinha--espremedor-de-alho", "name": "Espremedor de alho", "qty": 1}, {"id": "cozinha--abridor-de-latas", "name": "Abridor de latas", "qty": 1}, {"id": "cozinha--descascador-de-legumes", "name": "Descascador de legumes", "qty": 1}, {"id": "cozinha--cortador-de-pizza", "name": "Cortador de pizza", "qty": 1}, {"id": "cozinha--fouet", "name": "Fouet", "qty": 1}, {"id": "cozinha--pegador-de-massa", "name": "Pegador de massa", "qty": 2}, {"id": "cozinha--espatula-de-silicone", "name": "Espátula de silicone", "qty": 1}, {"id": "cozinha--colher-de-silicone", "name": "Colher de silicone", "qty": 1}, {"id": "cozinha--concha-grande", "name": "Concha grande", "qty": 1}, {"id": "cozinha--concha-pequena", "name": "Concha pequena", "qty": 1}, {"id": "cozinha--colher-de-pau", "name": "Colher de pau", "qty": null}, {"id": "cozinha--copo-medidor", "name": "Copo medidor", "qty": 1}, {"id": "cozinha--colheres-medidoras", "name": "Colheres medidoras", "qty": 1}, {"id": "cozinha--colher-grande-de-servir", "name": "Colher grande de servir", "qty": 2}, {"id": "cozinha--faca-grande", "name": "Faca grande", "qty": 2}]}, {"name": "Louça e mesa", "items": [{"id": "louca-e-mesa--prato-de-sobremesa", "name": "Prato de sobremesa", "qty": 2}, {"id": "louca-e-mesa--copos", "name": "Copos", "qty": 2}, {"id": "louca-e-mesa--canecas", "name": "Canecas", "qty": null}, {"id": "louca-e-mesa--jarra-de-vidro", "name": "Jarra de vidro", "qty": 1}, {"id": "louca-e-mesa--acucareiro", "name": "Açucareiro", "qty": 1}, {"id": "louca-e-mesa--mantegueira", "name": "Mantegueira", "qty": 1}, {"id": "louca-e-mesa--saleiro", "name": "Saleiro", "qty": 1}, {"id": "louca-e-mesa--descanso-de-panela", "name": "Descanso de panela", "qty": 2}, {"id": "louca-e-mesa--jogo-americano", "name": "Jogo americano", "qty": 1}]}, {"name": "Potes e organização", "items": [{"id": "potes-e-organizacao--porta-temperos", "name": "Porta temperos", "qty": 1}, {"id": "potes-e-organizacao--potes-hermeticos-para-mantimentos", "name": "Potes herméticos para mantimentos", "qty": 1}, {"id": "potes-e-organizacao--potes-de-vidro-para-geladeira", "name": "Potes de vidro para geladeira", "qty": null}, {"id": "potes-e-organizacao--porta-cha", "name": "Porta chá", "qty": 1}, {"id": "potes-e-organizacao--pote-para-arroz", "name": "Pote para arroz", "qty": 1}, {"id": "potes-e-organizacao--bowls-tigelas", "name": "Bowls/tigelas", "qty": null}, {"id": "potes-e-organizacao--porta-pao", "name": "Porta pão", "qty": 1}]}, {"name": "Limpeza", "items": [{"id": "limpeza--lixeira-pequena-para-pia", "name": "Lixeira pequena para pia", "qty": 1}, {"id": "limpeza--porta-detergente-esponja", "name": "Porta detergente/esponja", "qty": 1}, {"id": "limpeza--panos-de-prato", "name": "Panos de prato", "qty": null}, {"id": "limpeza--panos-multiuso", "name": "Panos multiuso", "qty": null}, {"id": "limpeza--luvas-de-cozinha", "name": "Luvas de cozinha", "qty": 1}, {"id": "limpeza--rodo-de-pia", "name": "Rodo de pia", "qty": 1}, {"id": "limpeza--panos-microfibra", "name": "Panos microfibra", "qty": null}]}, {"name": "Banheiro", "items": [{"id": "banheiro--toalhas-de-rosto", "name": "Toalhas de rosto", "qty": null}, {"id": "banheiro--tapete-de-banheiro", "name": "Tapete de banheiro", "qty": 1}, {"id": "banheiro--porta-sabonete-liquido", "name": "Porta sabonete líquido", "qty": 1}, {"id": "banheiro--saboneteira", "name": "Saboneteira", "qty": 1}, {"id": "banheiro--porta-escovas-de-dente-com-tampa", "name": "Porta escovas de dente com tampa", "qty": 1}, {"id": "banheiro--escova-sanitaria", "name": "Escova sanitária", "qty": 1}, {"id": "banheiro--porta-papel-higienico", "name": "Porta papel higiênico", "qty": 1}]}, {"name": "Quarto", "items": [{"id": "quarto--cabides", "name": "Cabides", "qty": null}, {"id": "quarto--fronhas-avulsas", "name": "Fronhas avulsas", "qty": null}, {"id": "quarto--colmeias-organizadores-de-gaveta", "name": "Colmeias/organizadores de gaveta", "qty": null}]}, {"name": "Lavanderia e limpeza da casa", "items": [{"id": "lavanderia-e-limpeza-da-casa--pregadores", "name": "Pregadores", "qty": null}, {"id": "lavanderia-e-limpeza-da-casa--baldes", "name": "Baldes", "qty": null}, {"id": "lavanderia-e-limpeza-da-casa--rodo", "name": "Rodo", "qty": 1}, {"id": "lavanderia-e-limpeza-da-casa--vassoura", "name": "Vassoura", "qty": 2}, {"id": "lavanderia-e-limpeza-da-casa--pa-de-lixo", "name": "Pá de lixo", "qty": 1}, {"id": "lavanderia-e-limpeza-da-casa--espanador", "name": "Espanador", "qty": 1}]}];
 
 function getMyId(){
   try{
@@ -767,6 +799,31 @@ document.getElementById('modal-confirm').addEventListener('click', confirmAction
 document.getElementById('scroll-cta').addEventListener('click', () => {
   document.getElementById('categories').scrollIntoView({ behavior:'smooth', block:'start' });
 });
+
+function renderCountdown(){
+  const el = document.getElementById('countdown');
+  const eventDate = new Date(2026, 9, 18); // 18 de outubro de 2026
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+
+  let numText, labelText;
+  if(diffDays > 1){
+    numText = diffDays;
+    labelText = 'dias para o grande dia';
+  } else if(diffDays === 1){
+    numText = '1';
+    labelText = 'dia para o grande dia';
+  } else if(diffDays === 0){
+    numText = '\u{1F389}';
+    labelText = '\u00c9 hoje!';
+  } else {
+    numText = '\u{1F389}';
+    labelText = 'J\u00e1 aconteceu';
+  }
+  el.innerHTML = `<span class="countdown-num">${numText}</span><span class="countdown-label">${labelText}</span>`;
+}
+renderCountdown();
 
 function hideLoading(){
   const loading = document.getElementById('loading');
