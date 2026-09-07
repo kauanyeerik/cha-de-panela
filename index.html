@@ -106,15 +106,28 @@
     line-height:1.65;
   }
   .countdown{
-    display:inline-flex; align-items:baseline; gap:8px;
-    margin:0 0 30px; padding:10px 22px;
+    display:flex; align-items:stretch; justify-content:center;
+    gap:10px; margin:0 0 30px; flex-wrap:wrap;
+  }
+  .countdown-box{
+    background:#ffffff;
+    border-radius:14px;
+    padding:14px 14px 12px;
+    min-width:64px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    box-shadow:0 2px 14px rgba(20,18,15,0.07);
+  }
+  .countdown-box .countdown-num{
+    font-family:'Montserrat', sans-serif; font-weight:700; font-size:30px;
+    color:#7F7B75; line-height:1.1;
+  }
+  .countdown-box .countdown-label{
+    font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+    color:#7F7B75; opacity:0.85;
+  }
+  .countdown-done{
+    font-size:14px; color:#7F7B75; padding:12px 22px;
     border:1px solid var(--line-strong); border-radius:999px;
-  }
-  .countdown .countdown-num{
-    font-family:'Montserrat', sans-serif; font-weight:700; font-size:18px;
-  }
-  .countdown .countdown-label{
-    font-size:12px; letter-spacing:0.04em; color:var(--ink-soft);
   }
   .hero .cta{
     display:inline-flex; align-items:center; gap:10px;
@@ -802,26 +815,36 @@ document.getElementById('scroll-cta').addEventListener('click', () => {
 
 function renderCountdown(){
   const el = document.getElementById('countdown');
-  const eventDate = new Date(2026, 9, 18); // 18 de outubro de 2026
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+  const eventDate = new Date(2026, 9, 18, 0, 0, 0);
+  let timer;
 
-  let numText, labelText;
-  if(diffDays > 1){
-    numText = diffDays;
-    labelText = 'dias para o grande dia';
-  } else if(diffDays === 1){
-    numText = '1';
-    labelText = 'dia para o grande dia';
-  } else if(diffDays === 0){
-    numText = '\u{1F389}';
-    labelText = '\u00c9 hoje!';
-  } else {
-    numText = '\u{1F389}';
-    labelText = 'J\u00e1 aconteceu';
+  function tick(){
+    const now = new Date();
+    const diffMs = eventDate - now;
+
+    if(diffMs <= 0){
+      el.innerHTML = `<div class="countdown-done">\u{1F389} O grande dia chegou!</div>`;
+      clearInterval(timer);
+      return;
+    }
+
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = (n) => String(n).padStart(2, '0');
+
+    el.innerHTML = `
+      <div class="countdown-box"><span class="countdown-num">${days}</span><span class="countdown-label">Dias</span></div>
+      <div class="countdown-box"><span class="countdown-num">${pad(hours)}</span><span class="countdown-label">Horas</span></div>
+      <div class="countdown-box"><span class="countdown-num">${pad(minutes)}</span><span class="countdown-label">Minutos</span></div>
+      <div class="countdown-box"><span class="countdown-num">${pad(seconds)}</span><span class="countdown-label">Segundos</span></div>
+    `;
   }
-  el.innerHTML = `<span class="countdown-num">${numText}</span><span class="countdown-label">${labelText}</span>`;
+
+  tick();
+  timer = setInterval(tick, 1000);
 }
 renderCountdown();
 
